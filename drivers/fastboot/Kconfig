@@ -87,7 +87,7 @@ config FASTBOOT_USB_DEV
 config FASTBOOT_FLASH
 	bool "Enable FASTBOOT FLASH command"
 	default y if ARCH_SUNXI || ARCH_ROCKCHIP
-	depends on MMC || (MTD_RAW_NAND && CMD_MTDPARTS)
+	depends on MMC || (MTD_RAW_NAND && CMD_MTDPARTS) || BLK
 	select IMAGE_SPARSE
 	help
 	  The fastboot protocol includes a "flash" command for writing
@@ -109,11 +109,15 @@ choice
 
 config FASTBOOT_FLASH_MMC
 	bool "FASTBOOT on MMC"
-	depends on MMC
+	depends on MMC && BLK
 
 config FASTBOOT_FLASH_NAND
 	bool "FASTBOOT on NAND"
 	depends on MTD_RAW_NAND && CMD_MTDPARTS
+
+config FASTBOOT_FLASH_BLOCK
+	bool "FASTBOOT on block device"
+	depends on BLK
 
 endchoice
 
@@ -188,6 +192,18 @@ config FASTBOOT_MMC_USER_NAME
 	  "fastboot flash" and the "fastboot erase" commands match the value
 	  defined here.
 	  The default target name for erasing EMMC_USER is "mmc0".
+
+config FASTBOOT_FLASH_BLOCK_INTERFACE_NAME
+	string "Define FASTBOOT block interface name"
+	depends on FASTBOOT_FLASH_BLOCK
+	help
+	  "Fastboot block interface name (mmc, virtio, etc)"
+
+config FASTBOOT_FLASH_BLOCK_DEVICE_ID
+	int "Define FASTBOOT block device id"
+	depends on FASTBOOT_FLASH_BLOCK
+	help
+	  "Fastboot block device id"
 
 config FASTBOOT_GPT_NAME
 	string "Target name for updating GPT"
